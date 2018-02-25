@@ -63,7 +63,7 @@ bool print_log(const char* src, int code) {
 void handle_siren()
 {
   if(runSiren == false){
-    Serial.println("turn off");
+    //Serial.println("turn off");
     digitalWrite(sirenPin, HIGH);
     nextTimeSiren = 0;
     sirenRunningNow = false;
@@ -73,13 +73,13 @@ void handle_siren()
       sirenRunningNow = false;
       // This next line is just for in case. The mqtt client is blocking and takes long enough
       // that the minimum time between calls is far more than this.
-      nextTimeSiren = millis() + 50;
-      Serial.println("turn off");
+      nextTimeSiren = 0;
+      //Serial.println("turn off");
       digitalWrite(sirenPin, HIGH);
     } else {
       sirenRunningNow = true;
       nextTimeSiren = millis() + 1000;
-      Serial.println("turn on");
+      //Serial.println("turn on");
       digitalWrite(sirenPin, LOW);
     }
     
@@ -146,11 +146,11 @@ void setup() {
 
 void loop() {
   unsigned long timeNow = millis();
-  Serial.println(timeNow);
+//  Serial.println(timeNow);
   // Amazon limits us to only checking once per second, and to be as responsive as possible when given a command
   // by a user, don't want to go any past that. So check them every second.
   if(timeNow >= nextTimeShadow){
-    Serial.println("Checking Shadow");
+    //Serial.println("Checking Shadow");
     if(success_connect) {
       if(myClient.yield()) {
         Serial.println(F("Yield failed."));
@@ -164,5 +164,7 @@ void loop() {
       handle_siren();
     }
   }
-
+  if((sirenRunningNow == true) && (!runSiren)){
+      handle_siren();
+  }
 }
